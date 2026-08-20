@@ -1,0 +1,32 @@
+---
+const links = [
+  { href: '#philosophy', label: 'Philosophy' },
+  { href: '#work', label: 'Work' },
+  { href: '#contact', label: 'Contact' },
+];
+---
+
+<header class="fixed inset-x-0 top-0 z-50">
+  <nav
+    class="mx-auto flex max-w-6xl items-center justify-between px-6 py-5 text-sm sm:px-10"
+    aria-label="Primary"
+  >
+    <a href="#top" class="font-display text-lg tracking-tight text-paper">
+      Trinity
+    </a>
+    <ul class="flex items-center gap-6 sm:gap-8">
+      {
+        links.map((link) => (
+          <li>
+            <a
+              href={link.href}
+              class="text-paper-dim transition-colors duration-300 hover:text-signal"
+            >
+              {link.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+</header>

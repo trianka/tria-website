@@ -1,0 +1,24 @@
+---
+import { work } from '../../data/work';
+import WorkCard from './WorkCard.astro';
+---
+
+<section id="work" class="relative bg-ink px-6 py-28 sm:px-10 sm:py-36">
+  <div class="mx-auto max-w-6xl">
+    <p data-reveal class="font-sans text-sm uppercase tracking-[0.25em] text-signal">
+      Selected work
+    </p>
+
+    <h2
+      data-reveal
+      data-reveal-delay="0.08"
+      class="text-balance mt-6 max-w-2xl font-display text-3xl font-medium leading-tight text-paper sm:text-5xl"
+    >
+      Enterprise software, blockchain, and public health — the throughline is systems thinking.
+    </h2>
+
+    <div data-reveal-group class="mt-16 grid gap-6 md:grid-cols-3">
+      {work.map((entry) => <WorkCard entry={entry} />)}
+    </div>
+  </div>
+</section>

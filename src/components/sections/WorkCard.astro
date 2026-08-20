@@ -1,0 +1,32 @@
+---
+import type { WorkEntry } from '../../data/work';
+
+interface Props {
+  entry: WorkEntry;
+}
+
+const { entry } = Astro.props;
+---
+
+<article
+  data-reveal-item
+  class="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-paper-dim/15 bg-ink-raised p-8 transition-colors duration-300 hover:border-signal/50"
+>
+  <div>
+    <div class="flex items-baseline justify-between gap-4">
+      <h3 class="font-display text-2xl text-paper">{entry.org}</h3>
+    </div>
+    <p class="mt-1 font-sans text-sm uppercase tracking-wide text-signal">{entry.focus}</p>
+    <p class="mt-5 font-sans text-base leading-relaxed text-paper-dim">{entry.summary}</p>
+  </div>
+
+  <ul class="mt-8 flex flex-wrap gap-2">
+    {
+      entry.tags.map((tag) => (
+        <li class="rounded-full border border-paper-dim/20 px-3 py-1 font-sans text-xs text-paper-dim">
+          {tag}
+        </li>
+      ))
+    }
+  </ul>
+</article>

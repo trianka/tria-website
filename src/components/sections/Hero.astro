@@ -1,0 +1,50 @@
+---
+import SystemsCanvas from '../three/SystemsCanvas';
+---
+
+<section id="top" class="relative flex min-h-[100svh] items-center overflow-hidden bg-ink">
+  <div class="pointer-events-none absolute inset-0" aria-hidden="true">
+    <SystemsCanvas client:only="react" />
+  </div>
+
+  <div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-ink/10 via-ink/40 to-ink"></div>
+
+  <div class="relative z-10 mx-auto w-full max-w-6xl px-6 pt-24 sm:px-10">
+    <p data-reveal class="font-sans text-sm uppercase tracking-[0.25em] text-signal">
+      Design thinking &middot; Systems &middot; Technology
+    </p>
+
+    <h1
+      data-reveal
+      data-reveal-delay="0.1"
+      class="text-balance mt-6 max-w-4xl font-display text-4xl font-semibold leading-[1.05] text-paper sm:text-6xl md:text-7xl"
+    >
+      I ask why it needs to exist, <em class="text-accent not-italic">before</em> what to build.
+    </h1>
+
+    <p
+      data-reveal
+      data-reveal-delay="0.2"
+      class="text-balance mt-8 max-w-xl font-sans text-lg leading-relaxed text-paper-dim sm:text-xl"
+    >
+      I work at the intersection of humans and technology — not as a developer, but as someone
+      who understands what technology can and cannot do, and how to turn that understanding into
+      real impact in health, education, and poverty alleviation.
+    </p>
+
+    <div data-reveal data-reveal-delay="0.3" class="mt-12 flex flex-wrap items-center gap-4">
+      <a
+        href="#work"
+        class="rounded-full bg-accent px-7 py-3 font-sans text-sm font-medium text-ink transition-transform duration-300 hover:scale-105"
+      >
+        See selected work
+      </a>
+      <a
+        href="#contact"
+        class="rounded-full border border-paper-dim/30 px-7 py-3 font-sans text-sm font-medium text-paper transition-colors duration-300 hover:border-signal hover:text-signal"
+      >
+        Get in touch
+      </a>
+    </div>
+  </div>
+</section>

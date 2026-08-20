@@ -1,11 +1,27 @@
-.DS_Store
-.claude/settings.local.json
-node_modules/
-__pycache__/
-*.pyc
-.env
-.venv/
-venv/
+# build output
 dist/
-build/
-*.log
+# generated types
+.astro/
+
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+
+# environment variables
+.env
+.env.production
+
+# macOS-specific files
+.DS_Store
+
+# jetbrains setting folder
+.idea/
+
+# Claude Code local settings
+.claude/settings.local.json

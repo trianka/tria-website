@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Nav from '../components/layout/Nav.astro';
+import Footer from '../components/layout/Footer.astro';
+import Hero from '../components/sections/Hero.astro';
+import Philosophy from '../components/sections/Philosophy.astro';
+import WorkGrid from '../components/sections/WorkGrid.astro';
+import Contact from '../components/sections/Contact.astro';
+---
+
+<BaseLayout>
+  <Nav />
+  <main>
+    <Hero />
+    <Philosophy />
+    <WorkGrid />
+    <Contact />
+  </main>
+  <Footer />
+
+  <script>
+    import { initScroll } from '../lib/scroll';
+    initScroll();
+  </script>
+</BaseLayout>
