@@ -1,0 +1,343 @@
+---
+import { nodes, edges, type GraphNode } from '../../data/graph';
+
+const SIZE = 1000;
+const CENTER = SIZE / 2;
+
+const RING_RADIUS: Record<GraphNode['tier'], number> = {
+  core: 0,
+  philosophy: 165,
+  skill: 320,
+  project: 445,
+};
+
+const NODE_RADIUS: Record<GraphNode['tier'], number> = {
+  core: 17,
+  philosophy: 11,
+  skill: 6,
+  project: 13,
+};
+
+const LABEL_GAP: Record<GraphNode['tier'], number> = {
+  core: 14,
+  philosophy: 16,
+  skill: 15,
+  project: 18,
+};
+
+const FONT_SIZE: Record<GraphNode['tier'], number> = {
+  core: 15,
+  philosophy: 12.5,
+  skill: 11,
+  project: 13.5,
+};
+
+const toRad = (deg: number) => (deg * Math.PI) / 180;
+
+function wrap(label: string, maxLen: number): string[] {
+  const words = label.split(' ');
+  const lines: string[] = [];
+  let current = '';
+  for (const word of words) {
+    const candidate = current ? `${current} ${word}` : word;
+    if (candidate.length > maxLen && current) {
+      lines.push(current);
+      current = word;
+    } else {
+      current = candidate;
+    }
+  }
+  if (current) lines.push(current);
+  return lines;
+}
+
+const maxLenByTier: Record<GraphNode['tier'], number> = {
+  core: 20,
+  philosophy: 16,
+  skill: 15,
+  project: 20,
+};
+
+const positioned = nodes.map((node) => {
+  const r = RING_RADIUS[node.tier];
+  const x = node.tier === 'core' ? CENTER : CENTER + r * Math.cos(toRad(node.angle));
+  const y = node.tier === 'core' ? CENTER : CENTER + r * Math.sin(toRad(node.angle));
+  const nodeR = NODE_RADIUS[node.tier];
+  const gap = LABEL_GAP[node.tier];
+
+  const isCore = node.tier === 'core';
+  const cos = isCore ? 0 : Math.cos(toRad(node.angle));
+  const sin = isCore ? 1 : Math.sin(toRad(node.angle));
+
+  const labelDist = nodeR + gap;
+  const lx = isCore ? x : x + labelDist * cos;
+  const ly = isCore ? y + nodeR + gap : y + labelDist * sin;
+
+  const anchor = cos > 0.3 ? 'start' : cos < -0.3 ? 'end' : 'middle';
+  const lines = wrap(node.label, maxLenByTier[node.tier]);
+  const startDy = -(lines.length - 1) * 0.55;
+
+  return { ...node, x, y, r: nodeR, lx, ly, anchor, lines, startDy, fontSize: FONT_SIZE[node.tier] };
+});
+
+const byId = new Map(positioned.map((n) => [n.id, n]));
+
+const adjacency = new Map<string, Set<string>>();
+for (const edge of edges) {
+  if (!adjacency.has(edge.from)) adjacency.set(edge.from, new Set());
+  if (!adjacency.has(edge.to)) adjacency.set(edge.to, new Set());
+  adjacency.get(edge.from)!.add(edge.to);
+  adjacency.get(edge.to)!.add(edge.from);
+}
+
+const lines = edges.map((edge) => {
+  const from = byId.get(edge.from)!;
+  const to = byId.get(edge.to)!;
+  return { ...edge, x1: from.x, y1: from.y, x2: to.x, y2: to.y };
+});
+
+const skillNodes = positioned.filter((n) => n.tier === 'skill');
+const coreNode = byId.get('core')!;
+---
+
+<section id="expertise" class="relative bg-ink px-6 py-28 sm:px-10 sm:py-36">
+  <div class="mx-auto max-w-6xl">
+    <p data-reveal class="font-sans text-sm uppercase tracking-[0.25em] text-signal">
+      How it connects
+    </p>
+
+    <h2
+      data-reveal
+      data-reveal-delay="0.08"
+      class="text-balance mt-6 max-w-2xl font-display text-3xl font-medium leading-tight text-paper sm:text-5xl"
+    >
+      Every project runs on the same three instincts — mapped node by node.
+    </h2>
+
+    <p
+      data-reveal
+      data-reveal-delay="0.16"
+      class="mt-6 max-w-2xl font-sans text-base leading-relaxed text-paper-dim"
+    >
+      The philosophy on the left doesn't stay abstract — it routes through six recurring
+      practices into the work on the right. Hover or focus any node to trace its connections.
+    </p>
+
+    <div data-reveal data-reveal-delay="0.22" class="mt-16 grid gap-10 lg:grid-cols-[1.4fr_1fr] lg:items-start">
+      <div class="rounded-3xl border border-paper-dim/15 bg-ink-raised p-4 sm:p-8">
+        <svg
+          data-graph
+          viewBox={`0 0 ${SIZE} ${SIZE}`}
+          class="graph-svg w-full"
+          role="img"
+          aria-label="Network diagram connecting Trinity's design-thinking philosophy, recurring practices, and delivered projects"
+        >
+          <g class="graph-edges">
+            {
+              lines.map((edge) => (
+                <line
+                  data-edge
+                  data-from={edge.from}
+                  data-to={edge.to}
+                  class={`edge edge-${edge.weight}`}
+                  x1={edge.x1}
+                  y1={edge.y1}
+                  x2={edge.x2}
+                  y2={edge.y2}
+                />
+              ))
+            }
+          </g>
+
+          <g class="graph-nodes">
+            {
+              positioned.map((node) => {
+                const links = Array.from(adjacency.get(node.id) ?? []).join(',');
+                return (
+                  <g
+                    data-node={node.id}
+                    data-links={links}
+                    data-label={node.label}
+                    data-detail={node.detail}
+                    class={`node node-${node.tier}`}
+                    tabindex="0"
+                    role="button"
+                    aria-label={`${node.label}: ${node.detail}`}
+                  >
+                    <circle class="node-hit" cx={node.x} cy={node.y} r={node.r + 12} />
+                    <circle class="node-dot" cx={node.x} cy={node.y} r={node.r} />
+                    <text
+                      class="node-label"
+                      x={node.lx}
+                      y={node.ly}
+                      text-anchor={node.anchor}
+                      font-size={node.fontSize}
+                    >
+                      {node.lines.map((line, i) => (
+                        <tspan x={node.lx} dy={i === 0 ? `${node.startDy}em` : '1.15em'}>
+                          {line}
+                        </tspan>
+                      ))}
+                    </text>
+                  </g>
+                );
+              })
+            }
+          </g>
+        </svg>
+
+        <div class="mt-6 flex flex-wrap gap-x-6 gap-y-2 border-t border-paper-dim/10 pt-5 font-sans text-xs text-paper-dim">
+          <span class="flex items-center gap-2"><span class="legend-dot bg-signal"></span>Philosophy</span>
+          <span class="flex items-center gap-2"><span class="legend-dot bg-paper-dim"></span>Recurring practice</span>
+          <span class="flex items-center gap-2"><span class="legend-dot bg-accent"></span>Delivered work</span>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-8">
+        <div class="rounded-2xl border border-signal/25 bg-ink-raised p-6">
+          <p class="font-sans text-xs uppercase tracking-[0.2em] text-signal">Selected node</p>
+          <p data-graph-detail-label class="mt-3 font-display text-lg text-paper">
+            {coreNode.label}
+          </p>
+          <p data-graph-detail-body class="mt-2 font-sans text-sm leading-relaxed text-paper-dim">
+            {coreNode.detail}
+          </p>
+        </div>
+
+        <div>
+          <p class="font-sans text-xs uppercase tracking-[0.2em] text-paper-dim">
+            The six practices, in full
+          </p>
+          <dl class="mt-4 flex flex-col gap-5">
+            {
+              skillNodes.map((skill) => (
+                <div class="border-t border-paper-dim/10 pt-4 first:border-t-0 first:pt-0">
+                  <dt class="font-sans text-sm font-medium text-paper">{skill.label}</dt>
+                  <dd class="mt-1.5 font-sans text-sm leading-relaxed text-paper-dim">
+                    {skill.detail}
+                  </dd>
+                </div>
+              ))
+            }
+          </dl>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .graph-svg {
+    overflow: visible;
+    height: auto;
+  }
+
+  .edge {
+    stroke: var(--color-paper-dim);
+    stroke-width: 1.25;
+    transition: opacity 0.25s ease;
+  }
+
+  .edge-strong {
+    opacity: 0.45;
+  }
+  .edge-medium {
+    opacity: 0.26;
+  }
+  .edge-light {
+    opacity: 0.14;
+  }
+
+  .edge.is-active {
+    stroke: var(--color-signal);
+    opacity: 0.9;
+    stroke-width: 1.75;
+  }
+  .edge.is-dim {
+    opacity: 0.06;
+  }
+
+  .node {
+    cursor: pointer;
+    outline: none;
+  }
+
+  .node-hit {
+    fill: transparent;
+  }
+
+  .node-dot {
+    transform-box: fill-box;
+    transform-origin: center;
+    transition:
+      transform 0.2s ease,
+      opacity 0.25s ease;
+  }
+
+  .node-label {
+    fill: var(--color-paper-dim);
+    font-family: var(--font-sans);
+    transition: opacity 0.25s ease;
+  }
+
+  .node-core .node-dot {
+    fill: var(--color-paper);
+  }
+  .node-core .node-label {
+    fill: var(--color-paper);
+    font-weight: 600;
+  }
+
+  .node-philosophy .node-dot {
+    fill: var(--color-signal);
+  }
+  .node-philosophy .node-label {
+    fill: var(--color-paper);
+  }
+
+  .node-skill .node-dot {
+    fill: var(--color-paper-dim);
+  }
+
+  .node-project .node-dot {
+    fill: var(--color-accent);
+  }
+  .node-project .node-label {
+    fill: var(--color-paper);
+  }
+
+  .node.is-active .node-dot {
+    transform: scale(1.5);
+  }
+  .node.is-active .node-label {
+    opacity: 1;
+  }
+  .node.is-dim {
+    opacity: 0.22;
+  }
+
+  .node:focus-visible .node-dot {
+    stroke: var(--color-signal);
+    stroke-width: 2;
+  }
+
+  .legend-dot {
+    display: inline-block;
+    height: 8px;
+    width: 8px;
+    border-radius: 999px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .edge,
+    .node-dot,
+    .node-label {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  import { initExpertiseGraph } from '../../lib/graph';
+  initExpertiseGraph();
+</script>
