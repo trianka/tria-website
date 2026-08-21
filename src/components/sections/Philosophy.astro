@@ -1,4 +1,7 @@
 ---
+import { Image } from 'astro:assets';
+import portrait from '../../assets/trinity-portrait.jpeg';
+
 const strengths = [
   {
     title: 'Technology without building it',
@@ -15,8 +18,21 @@ const strengths = [
 ];
 ---
 
-<section id="philosophy" class="relative bg-ink px-6 py-28 sm:px-10 sm:py-36">
-  <div class="mx-auto max-w-5xl">
+<section id="philosophy" class="relative overflow-hidden bg-ink px-6 py-28 sm:px-10 sm:py-36">
+  <div
+    aria-hidden="true"
+    class="portrait-fade pointer-events-none absolute right-6 top-20 z-0 hidden w-28 sm:right-10 sm:top-24 sm:block sm:w-32 lg:w-36"
+  >
+    <Image
+      src={portrait}
+      alt=""
+      width={240}
+      height={320}
+      class="h-auto w-full rounded-2xl object-cover opacity-80 grayscale"
+    />
+  </div>
+
+  <div class="relative z-10 mx-auto max-w-5xl">
     <p data-reveal class="font-sans text-sm uppercase tracking-[0.25em] text-signal">
       Philosophy
     </p>
@@ -51,3 +67,10 @@ const strengths = [
     </div>
   </div>
 </section>
+
+<style>
+  .portrait-fade {
+    mask-image: radial-gradient(ellipse 65% 70% at 50% 45%, black 45%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse 65% 70% at 50% 45%, black 45%, transparent 100%);
+  }
+</style>
