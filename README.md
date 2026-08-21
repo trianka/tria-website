@@ -39,4 +39,4 @@ src/
 
 ## Deployment
 
-Deploys to [Vercel](https://vercel.com), auto-deploying from pushes to `main` on this repo.
+Deploys to GitHub Pages via the `Build and deploy to GitHub Pages` workflow on pushes to `main`.
